@@ -3,6 +3,8 @@ from django.shortcuts import render
 # Create your views here.
 from requests.auth import HTTPBasicAuth
 import requests
+import json
+from.forms import LoginForm
 
 def index(request):
     return render(request, 'Login.html', {})
@@ -11,16 +13,28 @@ def api(request):
 
     # If this is POST request, then process the Form data
     if request.method == 'POST':
+        name = request.POST.get('uname')
+        pwd = request.POST.get('psw')
         userObj = {
-            'username':'iqmalhaziq', 
-            'password':'222d2cb18da63338',
+            'username': name, 
+            'password': pwd,
         }
+
         # Sends POST data
-        r = requests.post('http://techtrek2020.ap-southeast-1.elasticbeanstalk.com/login', data = userObj, params=request.POST)
+        response = requests.post('http://techtrek2020.ap-southeast-1.elasticbeanstalk.com/login', data = userObj, params=request.POST)
+        response_dict = json.loads(response.text);
+        for i in response_dict:
+            print("key: ", i, "val: ", response_dict[i])
     else:
-        r = request.get('http://techtrek2020.ap-southeast-1.elasticbeanstalk.com/extendSession', params=request.GET)
+        response = request.get('http://techtrek2020.ap-southeast-1.elasticbeanstalk.com/extendSession', params=request.GET)
 
-    if r.status_code == 200:
-        return HttpResponse('Yay, it worked')
+    
+    if response.status_code == 200:
+        # process JWT token
+        return HttpResponse('Authenticated!')
 
-    return HttpResponse('Could not save data')
+    elif response.status_code == 400:
+        return HttpResponse('Bad Request. The request parameters are incorrect')
+
+    else:
+        return HttpResponse('Not found')
