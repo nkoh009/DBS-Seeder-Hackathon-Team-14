@@ -19,10 +19,12 @@ from django.urls import path
 # Use include() to add paths from the catalog application
 from django.urls import include
 from django.views.generic import RedirectView
+from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('customerform/', include("newCustomerForm.urls")),
+    path('', views.index),
     path('home/', include("home.urls")),
-    path('completionpage/', include("CompletionPage.urls"))
+    path('customerform/', include("newCustomerForm.urls")),
+    path('completionpage/', include("CompletionPage.urls")),
 ]
